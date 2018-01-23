@@ -1,0 +1,8 @@
+*.annot
+*.cmi
+*.cmo
+*.pbm
+*.pgm
+*~
+*.log
+gmlray
