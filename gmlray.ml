@@ -10,7 +10,7 @@ let distance_eye_screen_in_pixels = float_of_int npixy *. 1.4
 
 
 (* définition et parcours des pixels *)
-type brightness = White | Black 
+type brightness = White | Black
 
 let xf = float_of_int npixx and yf = float_of_int npixy
 
@@ -29,38 +29,38 @@ let output_image_from_pixel_bw_values filename pixelcoords_to_brightness =
 	);
       done
     done;
-    close_out oc 
+    close_out oc
 
 (* exemples d'utilisations jusque là : 2D 1bit *)
 
 let xor a b =
   if a then not b else b;;
-  
+
 let _ =
   if (test_run) then
     begin
-      output_image_from_pixel_bw_values "checkerboard_small.pbm" 
-	(fun x y -> if (((x+y) mod 2)=1) then Black else White);	
-    
+      output_image_from_pixel_bw_values "checkerboard_small.pbm"
+	(fun x y -> if (((x+y) mod 2)=1) then Black else White);
+
     let taille = 8 in
     let pulsewidth = taille / 2 in
     let checkerboard_big x y =
       if (
-	xor ((x mod taille) >= pulsewidth) 
+	xor ((x mod taille) >= pulsewidth)
 	  ((y mod taille) >= pulsewidth)
-      ) 
+      )
       then Black else White in
-      output_image_from_pixel_bw_values "checkerboard_big.pbm" 
+      output_image_from_pixel_bw_values "checkerboard_big.pbm"
 	checkerboard_big;
     end
-    
+
 (* on va gérer les niveaux de gris *)
 
 let clamp_to_byte float =
   let byte_value = int_of_float (256. *. float) in
     if (byte_value<0) then 0 else
     if (byte_value>255) then 255 else
-      byte_value;;     
+      byte_value;;
 
 let output_image_from_pixel_grey_values filename pixelcoords_to_grey_value =
   let oc = open_out filename in
@@ -73,7 +73,7 @@ let output_image_from_pixel_grey_values filename pixelcoords_to_grey_value =
 	fprintf oc "%d\n" (clamp_to_byte (pixelcoords_to_grey_value x y))
       done
     done;
-    close_out oc;; 
+    close_out oc;;
 
 (* routines passant d'une valeur en niveau de gris à une valeur noir ou blanc *)
 
@@ -85,7 +85,7 @@ let grey_to_brightness_random_dither x y grey_value =
 
 (* dither avec trame *)
 
-type pattern = { 
+type pattern = {
 	       pattern_normalisation : float;
 	       pattern_data : int array array };;
 
@@ -112,10 +112,10 @@ Oui on pourrait faire un buffer de flottants.
 let output_several_image_from_pixel_grey_values filenamestub pixelcoords_to_grey_value =
   output_image_from_pixel_grey_values (filenamestub^".grey.pgm") pixelcoords_to_grey_value ;
   output_image_from_pixel_bw_values (filenamestub^".dithered.pbm")
-  (fun x y -> grey_to_brightness_random_dither x y 
+  (fun x y -> grey_to_brightness_random_dither x y
     (pixelcoords_to_grey_value x y));
   output_image_from_pixel_bw_values (filenamestub^".pattern.pbm")
-  (fun x y -> grey_to_brightness_pattern x y 
+  (fun x y -> grey_to_brightness_pattern x y
     (pixelcoords_to_grey_value x y));;
 
 
@@ -164,7 +164,7 @@ let lampe = { position_lampe = {x= -1.;y= 1.;z= 0.} ; force_lampe = 5. };;
 
 let sky_color = 1.;;
 
-let intersection_to_greyvalue lieu_d_intersection = 
+let intersection_to_greyvalue lieu_d_intersection =
   match lieu_d_intersection with
       No_intersect -> sky_color |
       Intersect point_avec_normale ->
@@ -191,7 +191,7 @@ let intersect_horizontal_plane v =
   let y_plane = -1. in
     if v.y<0. then
       let ti = y_plane /. v.y in
-	Intersect {position={x=v.x *. ti; y=y_plane; z=v.z *. ti}; 
+	Intersect {position={x=v.x *. ti; y=y_plane; z=v.z *. ti};
 	 normale_normee={x=0.;y=1.;z=0.}}
     else
       No_intersect;;
@@ -201,7 +201,7 @@ type sphere = { sph_pos : vect3d ; sph_radius : float };;
 let ma_sphere = { sph_pos = { x=0.;y=0.;z= -2. } ; sph_radius = 1.0 ; };;
 
 
-(* 
+(*
 On calcule l'intersection entre :
 
 -la sphère de centre sph_pos et de rayon sph_radius
@@ -251,7 +251,7 @@ t = ------------------------------------------
    une fois obtenue la position de l'intersection on veut un vecteur
    normal à la sphère, vers l'extérieur, normé.
 
-   La réponse est simple : 
+   La réponse est simple :
    ( pos_intersect - sph_pos ) divisé par sa norme.
 
 *)
@@ -264,7 +264,7 @@ let intersect_sphere v =
   and c = norme2 vcentres -. carre ma_sphere.sph_radius in
   let discriminantp = carre svcv -. n2v *. c in
     (*printf "v %s svcv %.6f n2v %.6f d %.6f\n" (string_of_vect3d v) svcv n2v discriminantp;*)
-    if (discriminantp > 0.) 
+    if (discriminantp > 0.)
     then
       let ti = ( (dot_product vcentres v) -. sqrt(discriminantp) ) /. n2v in
       let pos_intersect = {x=v.x *. ti; y=v.y *. ti; z=v.z *. ti} in
@@ -289,35 +289,34 @@ let intersect_sphere v =
 (*   in output_image_from_pixel_bw_values pixelcoords_to_brightness;; *)
 
 
-(* output_image_from_pixel_bw_values "plan.pbm" 
+(* output_image_from_pixel_bw_values "plan.pbm"
    (fun x y ->
    let gazevector = gazevector_of_pixcoords x y in
    let intersection = intersect_horizontal_plane gazevector in
    let greyvalue = intersection_to_greyvalue intersection in
    grey_to_brightness_pattern x y greyvalue);;
-   
-   output_image_from_pixel_bw_values "plan02.pbm" 
-   (fun x y -> grey_to_brightness_pattern x y 
+
+   output_image_from_pixel_bw_values "plan02.pbm"
+   (fun x y -> grey_to_brightness_pattern x y
    (intersection_to_greyvalue
    (intersect_horizontal_plane
    (gazevector_of_pixcoords x y))));; *)
 
 if test_run then
 output_several_image_from_pixel_grey_values "plan"
-  (fun x y -> 
+  (fun x y ->
     (intersection_to_greyvalue
 	(intersect_horizontal_plane
 	    (gazevector_of_pixcoords x y))));;
 
 
 
-output_several_image_from_pixel_grey_values "sphere" 
+output_several_image_from_pixel_grey_values "sphere"
   (fun x y ->
     let gazevector = gazevector_of_pixcoords x y in
     let intersection =
       match intersect_sphere gazevector  with
 	  Intersect intersection_sphere as valeur -> valeur
 	| No_intersect ->
-	    intersect_horizontal_plane gazevector in           
+	    intersect_horizontal_plane gazevector in
      intersection_to_greyvalue intersection);;
-
