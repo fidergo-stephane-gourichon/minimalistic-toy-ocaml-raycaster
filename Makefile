@@ -32,7 +32,7 @@ png:
 	for a in *.pbm ; do convert -verbose "$$a" "$${a/.pbm/.png}" ; done ; )
 
 clean:
-	rm *.o *.cmx *.cmi *.cmo
+	rm -f *.o *.cmx *.cmi *.cmo
 
 arc:
 	(set -x ; \
